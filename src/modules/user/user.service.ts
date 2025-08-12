@@ -6,11 +6,9 @@ import { PrismaService } from '../database/prisma.service';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createUser(
-    user: Omit<Prisma.UserCreateInput, 'id' | 'created_at' | 'updated_at'>,
-  ): Promise<User> {
+  async createUser(): Promise<User> {
     try {
-      return await this.prisma.user.create({ data: user });
+      return await this.prisma.user.create({ data: {} });
     } catch (e) {
       throw new Error('Error creating user');
     }
