@@ -19,3 +19,16 @@
     * POST /api/user - обновляет настройки пользователя (по куке user_id);
 
     currency-freaks, exchangerate-api.com
+
+    docker run -d -p 6379:6379 redis - запуск redis на порту 6379(базовый порт для redis)
+    docker container stop <container_id> - остановить контейнер
+    docker exec -it 474cf431d8ea redis-cli - запустить redis-cli в контейнере
+    docker exec -it 474cf431d8ea redis-cli -h 127.0.0.1 -p 6379 (если контейнер запущен на другом порту)
+    docker container ls - показать список контейнеров
+    docker container rm <container_id> - удалить контейнер
+    docker image rm <image_id> - удалить образ
+    docker image ls - показать список образов
+    docker build -t currency-converter .
+
+
+Проверить мидлвейр и резолвятся ли зависимости например конфиг сервис.

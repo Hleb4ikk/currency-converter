@@ -5,7 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { appConfig } from './configuration/app.configuration';
 import { AuthMiddleware } from './common/middlewares/auth.middleware';
 import { CurrenciesModule } from './modules/currencies/currencies.module';
-import { CacheModule } from '@nestjs/cache-manager';
+
+import { CacheModule } from './modules/cache/cache.module';
 
 @Module({
   imports: [
@@ -16,10 +17,7 @@ import { CacheModule } from '@nestjs/cache-manager';
       load: [appConfig],
       envFilePath: ['.env.development.local', '.env.production.local'], // remove .env.dev for production
     }),
-    CacheModule.register({
-      ttl: 300_000,
-      isGlobal: true,
-    }),
+    CacheModule,
   ],
 })
 export class AppModule implements NestModule {

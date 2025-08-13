@@ -1,31 +1,38 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import {
-  Inject,
-  Injectable,
-  ServiceUnavailableException,
-} from '@nestjs/common';
-import axios from 'axios';
-import { Cache } from 'cache-manager';
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import axios, { AxiosResponse } from 'axios';
+import { MemoryCacheService } from '../cache/memory-cache.service';
+import { ConfigService } from '@nestjs/config';
+import { getDataFromConfig } from 'src/utils/get-data-from-config';
+import { CurrencyCode } from './types/CurrencyCode';
+import { SupportedCodesData } from './types/ResponseData';
 
 @Injectable()
 export class CurrenciesService {
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+  constructor(
+    private readonly memoryCacheService: MemoryCacheService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async fetchSupported(): Promise<unknown> {
     try {
-      const cached = await this.cacheManager.get('api/currencies');
+      const cached =
+        await this.memoryCacheService.get<CurrencyCode[]>('api/currencies');
       if (!cached) {
-        const response = await axios.get(
-          `https://v6.exchangerate-api.com/v6/${process.env.EXCHANGE_RATE_API_KEY}/codes`,
+        const response: AxiosResponse<SupportedCodesData> = await axios.get(
+          `https://v6.exchangerate-api.com/v6/${getDataFromConfig<string>(this.configService, 'exchangeRateApiKey')}/codes`,
         );
 
-        const currencies = response.data;
+        const currencies = response.data.supported_codes;
 
-        await this.cacheManager.set('api/currencies', currencies, 3600000);
+        await this.memoryCacheService.set(
+          'api/currencies',
+          currencies,
+          getDataFromConfig(this.configService, 'cacheTTLs.currenciesRequest'),
+        );
         return currencies;
       }
       return cached;
-    } catch (e) {
+    } catch {
       throw new ServiceUnavailableException(
         'Cannot fetch supported currencies',
       );

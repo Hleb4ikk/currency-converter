@@ -1,6 +1,6 @@
 export const appConfig = () => ({
   database: {
-    url: process.env.DATABASE_URL,
+    url: process.env.DATABASE_URL!,
   },
   cookies: {
     httpOnly: process.env.COOKIE_HTTP_ONLY === 'true',
@@ -9,5 +9,17 @@ export const appConfig = () => ({
     maxAge: Number(process.env.COOKIE_MAX_AGE ?? 86400000), // 1 day
     path: process.env.COOKIE_PATH ?? '/',
   },
-  exchangeRateApiKey: process.env.EXCHANGE_RATE_API_KEY,
+  exchangeRateApiKey: process.env.EXCHANGE_RATE_API_KEY!,
+  redis: {
+    url: `redis://${process.env.REDIS_HOST ?? '127.0.0.1'}:${process.env.REDIS_PORT ?? 6379}`,
+  },
+  cacheTTLs: {
+    sameRequests: Number(process.env.SAME_REQUESTS_CACHE_TTL ?? 300000),
+    currenciesRequest: Number(
+      process.env.CURRENCIES_REQUEST_CACHE_TTL ?? 3600000,
+    ),
+    baseTargerRequest: Number(
+      process.env.BASE_TARGET_REQUEST_CACHE_TTL ?? 86400000,
+    ),
+  },
 });
