@@ -4,14 +4,21 @@ import { UserModule } from './modules/user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { appConfig } from './configuration/app.configuration';
 import { AuthMiddleware } from './common/middlewares/auth.middleware';
+import { CurrenciesModule } from './modules/currencies/currencies.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
     DatabaseModule,
     UserModule,
+    CurrenciesModule,
     ConfigModule.forRoot({
       load: [appConfig],
-      envFilePath: ['.env.development', '.env.production'], // remove .env.dev for production
+      envFilePath: ['.env.development.local', '.env.production.local'], // remove .env.dev for production
+    }),
+    CacheModule.register({
+      ttl: 300_000,
+      isGlobal: true,
     }),
   ],
 })
