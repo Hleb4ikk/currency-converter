@@ -9,15 +9,16 @@ export class UserService {
   async createUser(): Promise<User> {
     try {
       return await this.prisma.user.create({ data: {} });
-    } catch (e) {
+    } catch {
       throw new Error('Error creating user');
     }
   }
 
   async getUserById(userId: string): Promise<User | null> {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
+    return user;
   }
 
   async updateUser(

@@ -9,7 +9,7 @@ export const appConfig = () => ({
     maxAge: Number(process.env.COOKIE_MAX_AGE ?? 86400000), // 1 day
     path: process.env.COOKIE_PATH ?? '/',
   },
-  exchangeRateApiKey: process.env.EXCHANGE_RATE_API_KEY!,
+  fxRatesApiKey: process.env.FX_RATES_API_KEY!,
   redis: {
     url: `redis://${process.env.REDIS_HOST ?? '127.0.0.1'}:${process.env.REDIS_PORT ?? 6379}`,
   },
@@ -18,8 +18,6 @@ export const appConfig = () => ({
     currenciesRequest: Number(
       process.env.CURRENCIES_REQUEST_CACHE_TTL ?? 3600000,
     ),
-    baseTargerRequest: Number(
-      process.env.BASE_TARGET_REQUEST_CACHE_TTL ?? 86400000,
-    ),
+    ratesRequest: Number(process.env.BASE_TARGET_REQUEST_CACHE_TTL ?? 86400000),
   },
 });

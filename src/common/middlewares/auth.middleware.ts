@@ -17,9 +17,18 @@ export class AuthMiddleware implements NestMiddleware {
     res: ResponseWithLocals,
     next: NextFunction,
   ) {
-    const token = req.cookies['user_id'];
+    let token = req.cookies['user_id'];
+
+    if (token) {
+      const user = await this.userService.getUserById(token);
+
+      if (!user) {
+        token = '';
+      }
+    }
 
     if (!token || token === '') {
+      //check if token exists in cookies
       const user = await this.userService.createUser();
 
       const cookieOptions = getDataFromConfig<CookieOptions>(

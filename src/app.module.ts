@@ -7,6 +7,7 @@ import { AuthMiddleware } from './common/middlewares/auth.middleware';
 import { CurrenciesModule } from './modules/currencies/currencies.module';
 
 import { CacheModule } from './modules/cache/cache.module';
+import { RatesModule } from './modules/rates/rates.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CacheModule } from './modules/cache/cache.module';
       envFilePath: ['.env.development.local', '.env.production.local'], // remove .env.dev for production
     }),
     CacheModule,
+    RatesModule,
   ],
 })
 export class AppModule implements NestModule {

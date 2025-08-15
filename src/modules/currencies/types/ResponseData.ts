@@ -1,8 +1,12 @@
-import { CurrencyCode } from './CurrencyCode';
-
-export type SupportedCodesData = {
-  result: string;
-  documentation: string;
-  terms_of_use: string;
-  supported_codes: CurrencyCode[];
-};
+export type CurrenciesData = Record<
+  string,
+  {
+    code: string;
+    name: string;
+    decimal_digits: number;
+    name_plural: string;
+    rounding: number;
+    symbol: string;
+    symbol_native: string;
+  }
+>;
