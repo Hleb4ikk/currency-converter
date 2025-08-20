@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  ValidationPipe,
+} from '@nestjs/common';
 import { DatabaseModule } from './modules/database/database.module';
 import { UserModule } from './modules/user/user.module';
 import { ConfigModule } from '@nestjs/config';
@@ -8,6 +13,8 @@ import { CurrenciesModule } from './modules/currencies/currencies.module';
 
 import { CacheModule } from './modules/cache/cache.module';
 import { RatesModule } from './modules/rates/rates.module';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { CacheInterceptor } from './common/interceptors/cache.interceptor';
 
 @Module({
   imports: [
@@ -20,6 +27,21 @@ import { RatesModule } from './modules/rates/rates.module';
     }),
     CacheModule,
     RatesModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
+    {
+      provide: APP_PIPE,
+      useFactory: () =>
+        new ValidationPipe({
+          transform: true,
+          whitelist: true,
+          forbidNonWhitelisted: true,
+        }),
+    },
   ],
 })
 export class AppModule implements NestModule {

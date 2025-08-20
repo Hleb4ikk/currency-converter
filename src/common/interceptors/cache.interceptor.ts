@@ -1,0 +1,49 @@
+import {
+  CallHandler,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { mergeMap, of } from 'rxjs';
+import { MemoryCacheService } from 'src/modules/cache/memory-cache.service';
+import { RequestWithCookies } from 'src/types/Request';
+import { ResponseWithLocals } from 'src/types/Response';
+import { getDataFromConfig } from 'src/utils/get-data-from-config';
+
+@Injectable()
+export class CacheInterceptor implements NestInterceptor {
+  constructor(
+    private readonly memoryCacheService: MemoryCacheService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {
+    const request: RequestWithCookies = context.switchToHttp().getRequest();
+    const response: ResponseWithLocals = context.switchToHttp().getResponse();
+
+    const token = request.cookies['user_id'] || response.locals.user_id;
+
+    if (!token) {
+      throw new ForbiddenException('User id not found');
+    }
+
+    const cacheKey = request.url.toUpperCase();
+
+    const cached = await this.memoryCacheService.get(cacheKey);
+    if (!cached) {
+      return next.handle().pipe(
+        mergeMap(async (response: Record<string, any>) => {
+          await this.memoryCacheService.set(
+            cacheKey,
+            response,
+            getDataFromConfig(this.configService, 'cacheTTLs.sameRequests'),
+          );
+          return response;
+        }),
+      );
+    }
+    return of(cached);
+  }
+}

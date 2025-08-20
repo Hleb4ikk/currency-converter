@@ -1,4 +1,4 @@
-import { Controller, Get, Query, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { RatesService } from './rates.service';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { ConvertOptionsDto } from './dto/convert-options.dto';
@@ -10,7 +10,7 @@ export class RatesController {
   @Get()
   getRates(
     @CurrentUserId() userId: string,
-    @Query(new ValidationPipe({ transform: true }))
+    @Query()
     convertOptionsDto: ConvertOptionsDto,
   ) {
     return this.ratesService.getRates(

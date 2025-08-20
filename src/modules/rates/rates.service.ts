@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -8,12 +9,12 @@ import axios, { AxiosResponse } from 'axios';
 import { getDataFromConfig } from 'src/utils/get-data-from-config';
 import { UserService } from '../user/user.service';
 import { RatesResponseData } from './types/ResponseData';
-import { RedisCacheService } from '../cache/redis-cache.service';
 import {
   extractTargetsFromConvertOptions,
   generateKeysFromConvertOptions,
 } from 'src/utils/convert-options-utils';
 import { mergeKeysAndValues } from 'src/utils/merge-keys-and-values';
+import { RedisCacheService } from '../cache/redis-cache.service';
 
 @Injectable()
 export class RatesService {
@@ -82,7 +83,7 @@ export class RatesService {
             }),
           ),
         );
-        console.log('not cached');
+
         return {
           base: response.data.base,
           rates: {
@@ -91,13 +92,15 @@ export class RatesService {
           },
         };
       }
+
       return {
         base: base_currrency,
         rates: cachedRates,
       };
     } catch (e) {
-      console.log(e);
-      throw new Error('Cannot fetch rates');
+      if (e instanceof Error) {
+        throw new InternalServerErrorException('Cannot fetch rates');
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 import { Response } from 'express';
 
 export interface ResponseWithLocals extends Response {
-  locals: Record<string, string>;
+  locals: Record<string, string | undefined>;
 }

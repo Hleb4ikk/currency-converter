@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
 
 @Injectable()
@@ -11,15 +6,11 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  onModuleInit() {
-    try {
-      this.$connect();
-    } catch (e) {
-      throw new InternalServerErrorException('Database connection error');
-    }
+  async onModuleInit() {
+    await this.$connect();
   }
 
-  onModuleDestroy() {
-    this.$disconnect();
+  async onModuleDestroy() {
+    await this.$disconnect();
   }
 }
