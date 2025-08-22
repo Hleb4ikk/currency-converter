@@ -1,4 +1,4 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { MemoryCacheService } from '../cache/memory-cache.service';
 import { ConfigService } from '@nestjs/config';
@@ -35,7 +35,7 @@ export class CurrenciesService {
 
       return cached;
     } catch {
-      throw new ServiceUnavailableException(
+      throw new InternalServerErrorException(
         'Cannot fetch supported currencies',
       );
     }

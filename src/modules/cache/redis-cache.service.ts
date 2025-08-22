@@ -13,6 +13,7 @@ export class RedisCacheService implements CacheStrategy {
   constructor(private readonly configService: ConfigService) {
     this.store = createRedisStore(
       getDataFromConfig(this.configService, 'redis.url'),
+      { throwOnErrors: true },
     );
   }
 

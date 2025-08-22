@@ -10,6 +10,7 @@ import {
 import { UserService } from './user.service';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { UserUpdateDto } from './dto/user-update.dto';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('api/user')
 export class UserController {
@@ -23,10 +24,16 @@ export class UserController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
+  @ApiBody({
+    type: UserUpdateDto,
+    examples: {
+      user: { value: { base_currency: 'USD', favorites: ['USD', 'EUR'] } },
+    },
+  })
   async updateUser(
     @CurrentUserId() userId: string,
-    @Body(ValidationPipe) user: UserUpdateDto,
+    @Body(ValidationPipe) userUpdateDto: UserUpdateDto,
   ) {
-    return this.userService.updateUser(userId, user);
+    return this.userService.updateUser(userId, userUpdateDto);
   }
 }

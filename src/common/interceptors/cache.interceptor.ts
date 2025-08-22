@@ -32,6 +32,7 @@ export class CacheInterceptor implements NestInterceptor {
     const cacheKey = request.url.toUpperCase();
 
     const cached = await this.memoryCacheService.get(cacheKey);
+    console.log(cached);
     if (!cached) {
       return next.handle().pipe(
         mergeMap(async (response: Record<string, any>) => {
