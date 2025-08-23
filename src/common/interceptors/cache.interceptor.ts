@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { mergeMap, of } from 'rxjs';
+import { userIdCookieName } from 'src/constants/auth.constants';
 import { MemoryCacheService } from 'src/modules/cache/memory-cache.service';
 import { RequestWithCookies } from 'src/types/Request';
 import { ResponseWithLocals } from 'src/types/Response';
@@ -23,7 +24,7 @@ export class CacheInterceptor implements NestInterceptor {
     const request: RequestWithCookies = context.switchToHttp().getRequest();
     const response: ResponseWithLocals = context.switchToHttp().getResponse();
 
-    const token = request.cookies['user_id'] || response.locals.user_id;
+    const token = request.cookies[userIdCookieName] || response.locals.user_id;
 
     if (!token) {
       throw new ForbiddenException('User id not found');

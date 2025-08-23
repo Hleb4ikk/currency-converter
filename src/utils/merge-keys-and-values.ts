@@ -1,9 +1,4 @@
-/**
- * Returns a key-value Object of passed keys and values.
- * @param keys Array of keys
- * @param values Array of values
- */
-
+//function that merges keys and values to the Record.
 export function mergeKeysAndValues<V>(
   keys: Array<string>,
   values: Array<V | undefined>,

@@ -1,6 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CookieOptions, NextFunction } from 'express';
+import { userIdCookieName } from 'src/constants/auth.constants';
 import { UserService } from 'src/modules/user/user.service';
 import { RequestWithCookies } from 'src/types/Request';
 import { ResponseWithLocals } from 'src/types/Response';
@@ -17,7 +18,7 @@ export class AuthMiddleware implements NestMiddleware {
     res: ResponseWithLocals,
     next: NextFunction,
   ) {
-    let token = req.cookies['user_id'];
+    let token = req.cookies[userIdCookieName];
 
     if (token) {
       const user = await this.userService.getUserById(token);
@@ -36,7 +37,7 @@ export class AuthMiddleware implements NestMiddleware {
         'cookies',
       );
 
-      res.cookie('user_id', user.id, cookieOptions);
+      res.cookie(userIdCookieName, user.id, cookieOptions);
 
       res.locals.user_id = user.id; //create a local for use at the first response
     }

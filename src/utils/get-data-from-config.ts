@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 
+//function that returns data from config.
 export function getDataFromConfig<T>(
   configService: ConfigService,
   propertyPath: string,
