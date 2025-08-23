@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Prisma, User } from 'generated/prisma';
 import { PrismaService } from '../database/prisma.service';
 
@@ -10,24 +10,31 @@ export class UserService {
     try {
       return await this.prisma.user.create({ data: {} });
     } catch {
-      throw new Error('Error creating user');
+      throw new InternalServerErrorException('Error creating user');
     }
   }
 
   async getUserById(userId: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-    return user;
+    try {
+      return await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+    } catch {
+      throw new InternalServerErrorException('Error getting user');
+    }
   }
 
   async updateUser(
     userId: string,
     user: Prisma.UserUpdateInput,
   ): Promise<User> {
-    return await this.prisma.user.update({
-      where: { id: userId },
-      data: user,
-    });
+    try {
+      return await this.prisma.user.update({
+        where: { id: userId },
+        data: user,
+      });
+    } catch {
+      throw new InternalServerErrorException('Error updating user');
+    }
   }
 }

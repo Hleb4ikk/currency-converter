@@ -7,62 +7,27 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiQuery,
 } from '@nestjs/swagger';
+import { ratesApiMetadata } from './metadata/rates-api.metadata';
 
 @Controller('api/rates')
 export class RatesController {
   constructor(private readonly ratesService: RatesService) {}
 
   @Get()
-  @ApiOkResponse({
-    description: 'Rates list for base currency',
-    example: {
-      base: 'USD',
-      rates: {
-        AUD: 1.5561302097,
-        EUR: 0.8608201003,
-        USD: 1,
-      },
-    },
-  })
-  @ApiNotFoundResponse({
-    description: 'User not found',
-    example: {
-      message: 'User not found, even though middleware passed.',
-      error: 'Not Found',
-      statusCode: 404,
-    },
-  })
-  @ApiBadRequestResponse({
-    description: 'Bad request',
-    example: {
-      message: ['Invalid target currency code'],
-      error: 'Bad Request',
-      statusCode: 400,
-    },
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal server error',
-    example: {
-      message: 'Cannot fetch rates',
-      error: 'Internal Server Error',
-      statusCode: 500,
-    },
-  })
-  @ApiQuery({
-    name: 'base',
-    example: 'USD',
-    required: false,
-    type: String,
-  })
-  @ApiQuery({
-    name: 'target',
-    example: 'USD,EUR,JPY',
-    description: 'Some values devided by comma',
-    required: true,
-    type: String,
-  })
+  @ApiOperation(ratesApiMetadata.handlers.getRates.operation)
+  @ApiOkResponse(ratesApiMetadata.handlers.getRates.responses.ok)
+  @ApiNotFoundResponse(ratesApiMetadata.handlers.getRates.responses.notFound)
+  @ApiBadRequestResponse(
+    ratesApiMetadata.handlers.getRates.responses.badRequest,
+  )
+  @ApiInternalServerErrorResponse(
+    ratesApiMetadata.handlers.getRates.responses.internalServerError,
+  )
+  @ApiQuery(ratesApiMetadata.handlers.getRates.queries.base)
+  @ApiQuery(ratesApiMetadata.handlers.getRates.queries.target)
   getRates(
     @CurrentUserId() userId: string,
     @Query()
