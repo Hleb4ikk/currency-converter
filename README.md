@@ -9,13 +9,13 @@ Features include caching, user preferences storage, and API documentation via Sw
 
 - Data caching for performance optimization:
 
-  - 24h cache for any ==base-target== pair (stored in DB).
+  - 24h cache for any **base-target** pair (stored in DB).
 
   - 5 min cache for repeated requests from the same user (in-memory via Redis).
 
 - User preferences management (stored in Supabase).
 
-- Automatic ==httpOnly== cookie ==user_id== assignment on first request.
+- Automatic **httpOnly** cookie **user_id** assignment on first request.
 
 - API documentation with Swagger.
 
@@ -37,25 +37,25 @@ Features include caching, user preferences storage, and API documentation via Sw
 
 ## 📂 Endpoints
 
-==GET /api/currencies==
+**GET /api/currencies**
 
 Returns a list of supported currencies (ISO4217).
 Cached for 1 hour.
 
-==GET /api/rates==
+**GET /api/rates**
 
 Returns exchange rates for a given currency.
 Query params:
 
-==base== — base currency (default: user preference or USD).
+**base** — base currency (default: user preference or USD).
 
-==targets== — comma-separated list of currencies (EUR,GBP,JPY).
+**targets** — comma-separated list of currencies (EUR,GBP,JPY).
 
-==GET /api/user==
+**GET /api/user**
 
 Returns user settings (based on cookie user_id).
 
-==POST /api/user==
+**POST /api/user**
 
 Updates user settings (based on cookie user_id).
 
@@ -88,7 +88,7 @@ npm install
 
 ### 3. Create .env files
 
-See ==.env.example==.
+See **.env.example**.
 
 Examples provided for:
 
@@ -151,4 +151,4 @@ npm run test:coverage
 ## 📖 API Documentation
 
 Available at:
-👉 ==http://localhost:8080/api==
+👉 **http://localhost:8080/api**
