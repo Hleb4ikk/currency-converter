@@ -43,9 +43,8 @@ Returns a list of supported currencies (ISO4217). Cached for 1 hour.
 **GET /api/rates**
 Returns exchange rates for a given currency. Query params:
 
-    **base** — base currency (default: user preference or USD).
-
-    **targets** — comma-separated list of currencies (EUR,GBP,JPY).
+- **base** — base currency (default: user preference or USD).
+- **targets** — comma-separated list of currencies (EUR,GBP,JPY).
 
 **GET /api/user**
 Returns user settings (based on cookie user_id).
