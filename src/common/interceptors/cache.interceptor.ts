@@ -13,6 +13,8 @@ import { RequestWithCookies } from 'src/types/Request';
 import { ResponseWithLocals } from 'src/types/Response';
 import { getDataFromConfig } from 'src/utils/get-data-from-config';
 
+//intercept method adds new value to memory cache by url and user token if user send the request.
+//checks if request with the same url and user token exists in db and returns cached value.
 @Injectable()
 export class CacheInterceptor implements NestInterceptor {
   constructor(
@@ -33,7 +35,6 @@ export class CacheInterceptor implements NestInterceptor {
     const cacheKey = request.url.toUpperCase();
 
     const cached = await this.memoryCacheService.get(cacheKey);
-    console.log(cached);
     if (!cached) {
       return next.handle().pipe(
         mergeMap(async (response: Record<string, any>) => {

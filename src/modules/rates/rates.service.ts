@@ -12,9 +12,10 @@ import { RatesResponseData } from './types/ResponseData';
 import {
   extractTargetsFromConvertOptions,
   generateKeysFromConvertOptions,
-} from 'src/utils/convert-options-utils';
+} from 'src/modules/rates/utils/convert-options-utils';
 import { mergeKeysAndValues } from 'src/utils/merge-keys-and-values';
 import { RedisCacheService } from '../cache/redis-cache.service';
+import generateNotCachedEntries from './utils/generate-not-cached-entries';
 
 @Injectable()
 export class RatesService {
@@ -43,64 +44,67 @@ export class RatesService {
       throw new BadRequestException('Targets param is empty');
     }
 
-    try {
-      const cacheKeys = generateKeysFromConvertOptions(base_currrency, target);
+    const cacheKeys = generateKeysFromConvertOptions(base_currrency, target);
 
-      const valuesFromCache: Array<number | undefined> =
-        await this.redisCacheService.getMany<number>(cacheKeys);
+    const valuesFromCache: Array<number | undefined> =
+      await this.redisCacheService.getMany<number>(cacheKeys);
 
-      const rates = mergeKeysAndValues<number>(
-        extractTargetsFromConvertOptions(cacheKeys),
-        valuesFromCache,
-      );
+    const rates = mergeKeysAndValues<number>(
+      extractTargetsFromConvertOptions(cacheKeys),
+      valuesFromCache,
+    );
 
-      const cachedRates: Record<string, number> = {};
+    const cachedRates: Record<string, number> = {};
 
-      for (const currency in rates) {
-        if (rates[currency]) {
-          cachedRates[currency] = rates[currency];
-        }
-      }
-
-      const notCachedRateKeys = Object.keys(rates).filter((key) => !rates[key]);
-
-      if (notCachedRateKeys.length > 0) {
-        const query_target = notCachedRateKeys.join(',');
-
-        const response: AxiosResponse<RatesResponseData> = await axios.get(
-          `https://api.fxratesapi.com/latest?api_key=${getDataFromConfig<string>(this.configService, 'fxRatesApiKey')}&base=${base_currrency}&currencies=${query_target}&resolution=1d&format=json`,
-        );
-
-        await this.redisCacheService.setMany(
-          generateKeysFromConvertOptions(base_currrency, notCachedRateKeys).map(
-            (key, index) => ({
-              key,
-              value: response.data.rates[notCachedRateKeys[index]],
-              ttl: getDataFromConfig(
-                this.configService,
-                'cacheTTLs.ratesRequest',
-              ),
-            }),
-          ),
-        );
-
-        return {
-          base: response.data.base,
-          rates: {
-            ...response.data.rates,
-            ...cachedRates,
-          },
-        };
-      }
-
-      return {
-        base: base_currrency,
-        rates: cachedRates,
-      };
-    } catch (e) {
-      if (e instanceof Error) {
-        throw new InternalServerErrorException('Cannot fetch rates');
+    for (const currency in rates) {
+      if (rates[currency]) {
+        cachedRates[currency] = rates[currency];
       }
     }
+
+    const notCachedRateKeys = Object.keys(rates).filter((key) => !rates[key]);
+
+    if (notCachedRateKeys.length > 0) {
+      const query_target = notCachedRateKeys.join(',');
+
+      let response: AxiosResponse<RatesResponseData>;
+
+      try {
+        response = await axios.get(
+          `https://api.fxratesapi.com/latest?api_key=${getDataFromConfig<string>(this.configService, 'fxRatesApiKey')}&base=${base_currrency}&currencies=${query_target}&resolution=1d&format=json`,
+        );
+      } catch {
+        throw new InternalServerErrorException('Cannot fetch rates');
+      }
+      const responseData: RatesResponseData = response.data;
+
+      if (!responseData.success) {
+        throw new InternalServerErrorException(
+          `fx_rate_api error: ${responseData.error}`,
+          responseData.description,
+        );
+      } else {
+        await this.redisCacheService.setMany(
+          generateNotCachedEntries(
+            responseData,
+            base_currrency,
+            notCachedRateKeys,
+            getDataFromConfig(this.configService, 'cacheTTLs.ratesRequest'),
+          ),
+        );
+      }
+      return {
+        base: responseData.base,
+        rates: {
+          ...responseData.rates,
+          ...cachedRates,
+        },
+      };
+    }
+
+    return {
+      base: base_currrency,
+      rates: cachedRates,
+    };
   }
 }

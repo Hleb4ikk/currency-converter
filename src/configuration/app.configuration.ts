@@ -1,4 +1,7 @@
+//App configuration.
 export const appConfig = () => ({
+  appPort: Number(process.env.APP_PORT!),
+
   database: {
     url: process.env.DATABASE_URL!,
   },

@@ -4,7 +4,7 @@ import { MemoryCacheService } from '../cache/memory-cache.service';
 import { ConfigService } from '@nestjs/config';
 import { getDataFromConfig } from 'src/utils/get-data-from-config';
 import { CurrenciesData } from './types/ResponseData';
-import extractCurrenciesFromResponse from 'src/utils/extract-currencies-from-response';
+import extractCurrenciesFromResponse from 'src/modules/currencies/utils/extract-currencies-from-response';
 
 @Injectable()
 export class CurrenciesService {

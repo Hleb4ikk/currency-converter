@@ -7,6 +7,10 @@ import { RequestWithCookies } from 'src/types/Request';
 import { ResponseWithLocals } from 'src/types/Response';
 import { getDataFromConfig } from 'src/utils/get-data-from-config';
 
+// Creates new users. If this is first request, user token will send in local property in response.
+// Adds Set-Cookie header, if user this is first request.
+// If user is in cookies header, but not exists in db, invalid user_id will delete from cookies.
+
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   constructor(
