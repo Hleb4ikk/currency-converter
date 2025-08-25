@@ -38,25 +38,19 @@ Features include caching, user preferences storage, and API documentation via Sw
 ## 📂 Endpoints
 
 **GET /api/currencies**
-
-Returns a list of supported currencies (ISO4217).
-Cached for 1 hour.
+Returns a list of supported currencies (ISO4217). Cached for 1 hour.
 
 **GET /api/rates**
+Returns exchange rates for a given currency. Query params:
 
-Returns exchange rates for a given currency.
-Query params:
+    **base** — base currency (default: user preference or USD).
 
-**base** — base currency (default: user preference or USD).
-
-**targets** — comma-separated list of currencies (EUR,GBP,JPY).
+    **targets** — comma-separated list of currencies (EUR,GBP,JPY).
 
 **GET /api/user**
-
 Returns user settings (based on cookie user_id).
 
 **POST /api/user**
-
 Updates user settings (based on cookie user_id).
 
 ## 🗄️ User Data Structure (Supabase)
@@ -116,7 +110,7 @@ Or run locally / via cloud (e.g. Upstash
 ### 6. Start the app
 
 ```bash
-   npm run start:dev
+npm run start:dev
 ```
 
 For production:
