@@ -27,7 +27,7 @@ export class RatesService {
 
   async getRates(userId: string, target: string[], base?: string) {
     let base_currrency = base;
-
+    // 1. check if base is provided
     if (!base_currrency) {
       const user = await this.userService.getUserById(userId);
 
@@ -39,31 +39,39 @@ export class RatesService {
 
       base_currrency = user.base_currency;
     }
-
+    // 2. check if target is not empty
     if (target.length === 0) {
       throw new BadRequestException('Targets param is empty');
     }
 
+    // 3. generate keys like USD->EUR, USD->GBP
     const cacheKeys = generateKeysFromConvertOptions(base_currrency, target);
 
+    // 4. get values from cache by keys from 3 point
     const valuesFromCache: Array<number | undefined> =
       await this.redisCacheService.getMany<number>(cacheKeys);
 
-    const rates = mergeKeysAndValues<number>(
+    // 5. merge keys and values to the Record like {USD->EUR: 1.15, USD->GBP: 0.86}.
+    // if value is undefined, it means that rate is not cached and be USD->JPY: undefined.
+    const raw_cached_rates = mergeKeysAndValues<number>(
       extractTargetsFromConvertOptions(cacheKeys),
       valuesFromCache,
     );
 
     const cachedRates: Record<string, number> = {};
 
-    for (const currency in rates) {
-      if (rates[currency]) {
-        cachedRates[currency] = rates[currency];
+    // 6. from raw data get only rates that are not undefined.
+    for (const currency in raw_cached_rates) {
+      if (raw_cached_rates[currency]) {
+        cachedRates[currency] = raw_cached_rates[currency];
       }
     }
-
-    const notCachedRateKeys = Object.keys(rates).filter((key) => !rates[key]);
-
+    // 7. Getting not cached rates. If they are undefined
+    const notCachedRateKeys = Object.keys(raw_cached_rates).filter(
+      (key) => !raw_cached_rates[key],
+    );
+    console.log(notCachedRateKeys);
+    // 8. If we have not cached rates, we need to fetch them from API.
     if (notCachedRateKeys.length > 0) {
       const query_target = notCachedRateKeys.join(',');
 
@@ -84,6 +92,7 @@ export class RatesService {
           responseData.description,
         );
       } else {
+        //9. Cache not cached rates.
         await this.redisCacheService.setMany(
           generateNotCachedEntries(
             responseData,
@@ -93,6 +102,7 @@ export class RatesService {
           ),
         );
       }
+      // 10. return cached and not cached rates.
       return {
         base: responseData.base,
         rates: {
@@ -101,7 +111,7 @@ export class RatesService {
         },
       };
     }
-
+    //11. return cached rates if point 8 is not reached.
     return {
       base: base_currrency,
       rates: cachedRates,
