@@ -7,7 +7,7 @@ import {
 import { CacheStrategy } from './cache.strategy';
 
 import Keyv, { KeyvEntry } from 'keyv';
-import KeyvRedis from '@keyv/redis';
+import KeyvRedis, { createKeyv } from '@keyv/redis';
 import { ConfigService } from '@nestjs/config';
 import { getDataFromConfig } from 'src/utils/get-data-from-config';
 
@@ -21,21 +21,17 @@ export class RedisCacheService
   constructor(private readonly configService: ConfigService) {
     const redisUrl = getDataFromConfig<string>(this.configService, 'redis.url');
 
-    // создаём Keyv с Redis-хранилищем
-    const redisStore = new KeyvRedis<string>(redisUrl, {
-      throwOnConnectError: false,
-    });
-    this.store = new Keyv<string>({ store: redisStore });
+    this.store = createKeyv(redisUrl) as Keyv<string>;
   }
 
-  async onModuleInit() {
+  onModuleInit() {
     const client = (this.store.opts.store as KeyvRedis<string>).client;
 
     client.on('reconnecting', () => {
       this.logger.log('Trying to reconnect to Redis...');
     });
 
-    client.on('ready', () => {
+    client.on('connect', () => {
       this.logger.log('Redis is connected.');
     });
 
@@ -44,16 +40,14 @@ export class RedisCacheService
         `Redis connection error${err.message ? `: ${err.message}` : '.'}`,
         err.stack,
       );
-      client.destroy();
+      if (err.message === 'Socket closed unexpectedly') {
+        client.destroy();
+      }
     });
 
     client.on('end', () => {
       this.logger.log('Redis connection closed.');
     });
-
-    this.logger.log('Connecting to Redis...');
-
-    await client.connect();
   }
 
   async onModuleDestroy() {
@@ -64,11 +58,11 @@ export class RedisCacheService
   }
 
   async get<T>(key: string): Promise<T | undefined> {
-    return this.store.get<T>(key);
+    return await this.store.get<T>(key);
   }
 
   async getMany<T>(keys: string[]): Promise<(T | undefined)[]> {
-    return this.store.getMany<T>(keys);
+    return await this.store.getMany<T>(keys);
   }
 
   async set(key: string, value: any, ttlSeconds: number): Promise<void> {
@@ -80,6 +74,6 @@ export class RedisCacheService
   }
 
   async delete(key: string): Promise<boolean> {
-    return this.store.delete(key);
+    return await this.store.delete(key);
   }
 }
