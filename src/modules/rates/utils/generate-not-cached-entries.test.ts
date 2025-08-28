@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { RatesSuccessResponse } from '../types/ResponseData';
 import generateNotCachedEntries from './generate-not-cached-entries';
 

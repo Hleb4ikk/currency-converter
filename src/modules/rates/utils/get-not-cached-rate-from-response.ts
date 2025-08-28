@@ -5,6 +5,5 @@ export default function getNotCachedRateFromResponse(
   responseData: RatesSuccessResponse,
   notCachedRateKey: string,
 ): number {
-  console.log('in func:' + notCachedRateKey);
   return responseData.rates[notCachedRateKey];
 }
