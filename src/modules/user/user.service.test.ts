@@ -8,7 +8,6 @@ describe('UserService', () => {
   let prisma: PrismaService;
 
   beforeEach(() => {
-    // мок prisma
     prisma = {
       user: {
         create: vi.fn(),
@@ -20,7 +19,6 @@ describe('UserService', () => {
     userService = new UserService(prisma);
   });
 
-  // --- createUser ---
   it('createUser -> must return created user', async () => {
     const mockUser = { id: '1', email: 'test@test.com' };
     (prisma.user.create as any).mockResolvedValue(mockUser);
@@ -39,7 +37,6 @@ describe('UserService', () => {
     );
   });
 
-  // --- getUserById ---
   it('getUserById -> must return user', async () => {
     const mockUser = { id: '2', email: 'user@test.com' };
     (prisma.user.findUnique as any).mockResolvedValue(mockUser);
@@ -60,7 +57,6 @@ describe('UserService', () => {
     );
   });
 
-  // --- updateUser ---
   it('updateUser -> должен вернуть обновленного пользователя', async () => {
     const mockUser = {
       id: '3',

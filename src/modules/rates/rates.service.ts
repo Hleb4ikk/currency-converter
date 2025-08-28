@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { getDataFromConfig } from 'src/utils/get-data-from-config';
 import { UserService } from '../user/user.service';
 import { RatesResponseData } from './types/ResponseData';
@@ -16,6 +16,7 @@ import {
 import { mergeKeysAndValues } from 'src/utils/merge-keys-and-values';
 import { RedisCacheService } from '../cache/redis-cache.service';
 import generateNotCachedEntries from './utils/generate-not-cached-entries';
+import fetchRates from './utils/fetchRates';
 
 @Injectable()
 export class RatesService {
@@ -26,9 +27,9 @@ export class RatesService {
   ) {}
 
   async getRates(userId: string, target: string[], base?: string) {
-    let base_currrency = base;
+    let base_currency = base;
     // 1. check if base is provided
-    if (!base_currrency) {
+    if (!base_currency) {
       const user = await this.userService.getUserById(userId);
 
       if (!user) {
@@ -37,7 +38,7 @@ export class RatesService {
         );
       }
 
-      base_currrency = user.base_currency;
+      base_currency = user.base_currency;
     }
     // 2. check if target is not empty
     if (target.length === 0) {
@@ -45,7 +46,7 @@ export class RatesService {
     }
 
     // 3. generate keys like USD->EUR, USD->GBP
-    const cacheKeys = generateKeysFromConvertOptions(base_currrency, target);
+    const cacheKeys = generateKeysFromConvertOptions(base_currency, target);
 
     // 4. get values from cache by keys from 3 point
     const valuesFromCache: Array<number | undefined> =
@@ -70,20 +71,15 @@ export class RatesService {
     const notCachedRateKeys = Object.keys(raw_cached_rates).filter(
       (key) => !raw_cached_rates[key],
     );
-    console.log(notCachedRateKeys);
     // 8. If we have not cached rates, we need to fetch them from API.
     if (notCachedRateKeys.length > 0) {
       const query_target = notCachedRateKeys.join(',');
 
-      let response: AxiosResponse<RatesResponseData>;
-
-      try {
-        response = await axios.get(
-          `https://api.fxratesapi.com/latest?api_key=${getDataFromConfig<string>(this.configService, 'fxRatesApiKey')}&base=${base_currrency}&currencies=${query_target}&resolution=1d&format=json`,
-        );
-      } catch {
-        throw new InternalServerErrorException('Cannot fetch rates');
-      }
+      const response: AxiosResponse<RatesResponseData> = await fetchRates(
+        this.configService,
+        base_currency,
+        query_target,
+      );
       const responseData: RatesResponseData = response.data;
 
       if (!responseData.success) {
@@ -96,7 +92,7 @@ export class RatesService {
         await this.redisCacheService.setMany(
           generateNotCachedEntries(
             responseData,
-            base_currrency,
+            base_currency,
             notCachedRateKeys,
             getDataFromConfig(this.configService, 'cacheTTLs.ratesRequest'),
           ),
@@ -113,7 +109,7 @@ export class RatesService {
     }
     //11. return cached rates if point 8 is not reached.
     return {
-      base: base_currrency,
+      base: base_currency,
       rates: cachedRates,
     };
   }

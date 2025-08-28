@@ -2,8 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { RatesSuccessResponse } from '../types/ResponseData';
 import generateNotCachedEntries from './generate-not-cached-entries';
 
-vi.mock('./get-not-cached-rate-from-response');
-
 describe('generateNotCachedEntries', () => {
   const responseData: RatesSuccessResponse = {
     success: true,
@@ -22,14 +20,14 @@ describe('generateNotCachedEntries', () => {
   const ttl = 360000;
 
   it('should return not cached entries', () => {
-    const res = generateNotCachedEntries(
-      responseData,
-      base_currency,
-      notCachedRateKeys,
-      ttl,
-    );
-    console.log(res);
-    expect(res).toEqual([
+    expect(
+      generateNotCachedEntries(
+        responseData,
+        base_currency,
+        notCachedRateKeys,
+        ttl,
+      ),
+    ).toEqual([
       { key: 'USD->EUR', value: 1.15, ttl: 360000 },
       { key: 'USD->GBP', value: 0.86, ttl: 360000 },
     ]);

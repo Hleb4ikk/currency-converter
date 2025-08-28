@@ -129,18 +129,6 @@ Run tests:
 npm run test
 ```
 
-Watch mode:
-
-```bash
-npm run test:watch
-```
-
-Coverage report:
-
-```bash
-npm run test:coverage
-```
-
 ## 📖 API Documentation
 
 Available at:
