@@ -23,7 +23,12 @@ import { CacheInterceptor } from './common/interceptors/cache.interceptor';
     CurrenciesModule,
     ConfigModule.forRoot({
       load: [appConfig],
-      envFilePath: ['.env.development.local', '.env.production.local'], // remove .env.dev for production
+      envFilePath: [
+        '.env',
+        process.env.NODE_ENV === 'production'
+          ? '.env.production.local'
+          : '.env.development.local',
+      ],
     }),
     CacheModule,
     RatesModule,
