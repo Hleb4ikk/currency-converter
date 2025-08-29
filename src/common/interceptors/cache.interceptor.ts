@@ -32,7 +32,7 @@ export class CacheInterceptor implements NestInterceptor {
       throw new ForbiddenException('User id not found');
     }
 
-    const cacheKey = request.url.toUpperCase();
+    const cacheKey = `${token}:${request.url.toUpperCase()}`;
 
     const cached = await this.memoryCacheService.get(cacheKey);
     if (!cached) {
