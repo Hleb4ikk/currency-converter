@@ -61,7 +61,7 @@ Updates user settings (based on cookie `user_id`).
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/<your-username>/currency-converter.git
+git clone https://github.com/Hleb4ikk/currency-converter.git
 cd currency-converter
 ```
 
