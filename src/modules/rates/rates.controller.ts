@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { RatesService } from './rates.service';
-import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
+import { CurrentUserId } from 'src/common/current-user-id.decorator';
 import { ConvertOptionsDto } from './dto/convert-options.dto';
 import {
   ApiBadRequestResponse,

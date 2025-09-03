@@ -8,13 +8,13 @@ import { DatabaseModule } from './modules/database/database.module';
 import { UserModule } from './modules/user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { appConfig } from './configuration/app.configuration';
-import { AuthMiddleware } from './common/middlewares/auth.middleware';
+import { AuthMiddleware } from './common/auth.middleware';
 import { CurrenciesModule } from './modules/currencies/currencies.module';
 
 import { CacheModule } from './modules/cache/cache.module';
 import { RatesModule } from './modules/rates/rates.module';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { CacheInterceptor } from './common/interceptors/cache.interceptor';
+import { CacheInterceptor } from './common/cache.interceptor';
 
 @Module({
   imports: [

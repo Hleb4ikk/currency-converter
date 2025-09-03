@@ -8,7 +8,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
+import { CurrentUserId } from 'src/common/current-user-id.decorator';
 import { UserUpdateDto } from './dto/user-update.dto';
 import {
   ApiBody,
