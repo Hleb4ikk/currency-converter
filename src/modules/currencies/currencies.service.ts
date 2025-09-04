@@ -1,9 +1,8 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import axios, { AxiosResponse } from 'axios';
 import { MemoryCacheService } from '../cache/memory-cache.service';
 import { ConfigService } from '@nestjs/config';
 import { getDataFromConfig } from 'src/utils/get-data-from-config';
-import { CurrenciesData } from './types/ResponseData';
+import fetchCurrencies from './utils/fetchCurrencies';
 
 @Injectable()
 export class CurrenciesService {
@@ -18,9 +17,7 @@ export class CurrenciesService {
         'currencies:GET:/api/currencies',
       );
       if (!cached) {
-        const response: AxiosResponse<CurrenciesData> = await axios.get(
-          `https://api.fxratesapi.com/currencies`,
-        );
+        const response = await fetchCurrencies();
 
         const currencies = Object.keys(response.data);
 
