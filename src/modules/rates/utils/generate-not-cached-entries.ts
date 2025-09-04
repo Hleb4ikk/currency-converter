@@ -1,6 +1,5 @@
 import { RatesSuccessResponse } from '../types/ResponseData';
 import { generateKeysFromConvertOptions } from 'src/modules/rates/utils/convert-options-utils';
-import getNotCachedRateFromResponse from './get-not-cached-rate-from-response';
 
 export default function generateNotCachedEntries(
   responseData: RatesSuccessResponse,
@@ -11,10 +10,7 @@ export default function generateNotCachedEntries(
   return generateKeysFromConvertOptions(base_currency, notCachedRateKeys).map(
     (key, index) => ({
       key,
-      value: getNotCachedRateFromResponse(
-        responseData,
-        notCachedRateKeys[index],
-      ),
+      value: responseData.rates[notCachedRateKeys[index]],
       ttl,
     }),
   );

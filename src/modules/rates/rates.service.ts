@@ -72,7 +72,6 @@ export class RatesService {
       }
     });
 
-    console.log(notCachedRateKeys);
     // 8. If we have not cached rates, we need to fetch them from API.
     if (notCachedRateKeys.length > 0) {
       const query_target = notCachedRateKeys.join(',');
