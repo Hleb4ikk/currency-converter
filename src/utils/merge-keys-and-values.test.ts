@@ -6,10 +6,8 @@ describe('mergeKeysAndValues', () => {
     const keys = ['key1', 'key2', 'key3'];
     const values = [1, 2, 3];
 
-    expect(mergeKeysAndValues(keys, values)).toEqual({
-      key1: 1,
-      key2: 2,
-      key3: 3,
-    });
+    expect(mergeKeysAndValues(keys, values)).toEqual(
+      new Map(Object.entries({ key1: 1, key2: 2, key3: 3 })),
+    );
   });
 });

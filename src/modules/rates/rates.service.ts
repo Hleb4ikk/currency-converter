@@ -59,18 +59,20 @@ export class RatesService {
       valuesFromCache,
     );
 
-    const cachedRates: Record<string, number> = {};
-
     // 6. from raw data get only rates that are not undefined.
-    for (const currency in raw_cached_rates) {
-      if (raw_cached_rates[currency]) {
-        cachedRates[currency] = raw_cached_rates[currency];
-      }
-    }
     // 7. Getting not cached rates. If they are undefined
-    const notCachedRateKeys = Object.keys(raw_cached_rates).filter(
-      (key) => !raw_cached_rates[key],
-    );
+    const cachedRates: Record<string, number> = {};
+    const notCachedRateKeys: string[] = [];
+
+    raw_cached_rates.forEach((rate, currency) => {
+      if (!rate) {
+        notCachedRateKeys.push(currency);
+      } else {
+        cachedRates[currency] = rate;
+      }
+    });
+
+    console.log(notCachedRateKeys);
     // 8. If we have not cached rates, we need to fetch them from API.
     if (notCachedRateKeys.length > 0) {
       const query_target = notCachedRateKeys.join(',');

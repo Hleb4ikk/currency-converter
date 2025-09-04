@@ -2,11 +2,11 @@
 export function mergeKeysAndValues<V>(
   keys: Array<string>,
   values: Array<V | undefined>,
-) {
-  const mergedData: Record<string, V | undefined> = {};
+): Map<string, V | undefined> {
+  const mergedData = new Map<string, V | undefined>();
 
   for (let i = 0; i < keys.length; i++) {
-    mergedData[keys[i]] = values[i];
+    mergedData.set(keys[i], values[i]);
   }
 
   return mergedData;
