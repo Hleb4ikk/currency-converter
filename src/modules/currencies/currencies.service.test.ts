@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { CurrenciesService } from './currencies.service';
 import { MemoryCacheService } from '../cache/memory-cache.service';
 import axios from 'axios';
-import extractCurrenciesFromResponse from 'src/modules/currencies/utils/extract-currencies-from-response';
 import { getDataFromConfig } from 'src/utils/get-data-from-config';
 
 // мокаем axios
@@ -55,20 +54,16 @@ describe('CurrenciesService', () => {
     (memoryCacheService.get as any).mockResolvedValue(null);
 
     const mockResponse = {
-      data: { symbols: { USD: 'US Dollar', EUR: 'Euro' } },
+      data: { USD: {}, EUR: {} },
     };
     (axios.get as any).mockResolvedValue(mockResponse);
-
-    (extractCurrenciesFromResponse as any).mockReturnValue(['USD', 'EUR']);
 
     const result = await service.fetchSupported();
 
     expect(axios.get).toHaveBeenCalledWith(
       'https://api.fxratesapi.com/currencies',
     );
-    expect(extractCurrenciesFromResponse).toHaveBeenCalledWith(
-      mockResponse.data,
-    );
+
     expect(memoryCacheService.set).toHaveBeenCalledWith(
       'currencies:GET:/api/currencies',
       ['USD', 'EUR'],

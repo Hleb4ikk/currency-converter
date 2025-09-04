@@ -4,7 +4,6 @@ import { MemoryCacheService } from '../cache/memory-cache.service';
 import { ConfigService } from '@nestjs/config';
 import { getDataFromConfig } from 'src/utils/get-data-from-config';
 import { CurrenciesData } from './types/ResponseData';
-import extractCurrenciesFromResponse from 'src/modules/currencies/utils/extract-currencies-from-response';
 
 @Injectable()
 export class CurrenciesService {
@@ -23,7 +22,7 @@ export class CurrenciesService {
           `https://api.fxratesapi.com/currencies`,
         );
 
-        const currencies = extractCurrenciesFromResponse(response.data);
+        const currencies = Object.keys(response.data);
 
         await this.memoryCacheService.set(
           'currencies:GET:/api/currencies',
