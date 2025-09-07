@@ -88,17 +88,18 @@ export class RatesService {
           `fx_rate_api error: ${responseData.error}`,
           responseData.description,
         );
-      } else {
-        //9. Cache not cached rates.
-        await this.redisCacheService.setMany(
-          generateNotCachedEntries(
-            responseData,
-            base_currency,
-            notCachedRateKeys,
-            getDataFromConfig(this.configService, 'cacheTTLs.ratesRequest'),
-          ),
-        );
       }
+
+      //9. Cache not cached rates.
+      await this.redisCacheService.setMany(
+        generateNotCachedEntries(
+          responseData,
+          base_currency,
+          notCachedRateKeys,
+          getDataFromConfig(this.configService, 'cacheTTLs.ratesRequest'),
+        ),
+      );
+
       // 10. return cached and not cached rates.
       return {
         base: responseData.base,
