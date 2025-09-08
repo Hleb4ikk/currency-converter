@@ -11,7 +11,6 @@ import { userIdCookieName } from 'src/constants/auth.constants';
 import { MemoryCacheService } from 'src/modules/cache/memory-cache.service';
 import { RequestWithCookies } from 'src/types/Request';
 import { ResponseWithLocals } from 'src/types/Response';
-import { getDataFromConfig } from 'src/utils/get-data-from-config';
 
 //intercept method adds new value to memory cache by url and user token if user send the request.
 //checks if request with the same url and user token exists in db and returns cached value.
@@ -41,7 +40,7 @@ export class CacheInterceptor implements NestInterceptor {
           await this.memoryCacheService.set(
             cacheKey,
             response,
-            getDataFromConfig(this.configService, 'cacheTTLs.sameRequests'),
+            this.configService.get('cacheTTLs.sameRequests')!,
           );
           return response;
         }),

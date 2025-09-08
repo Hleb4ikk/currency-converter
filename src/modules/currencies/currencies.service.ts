@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MemoryCacheService } from '../cache/memory-cache.service';
 import { ConfigService } from '@nestjs/config';
-import { getDataFromConfig } from 'src/utils/get-data-from-config';
 import fetchCurrencies from './utils/fetchCurrencies';
 
 @Injectable()
@@ -24,7 +23,7 @@ export class CurrenciesService {
         await this.memoryCacheService.set(
           'currencies:GET:/api/currencies',
           currencies,
-          getDataFromConfig(this.configService, 'cacheTTLs.currenciesRequest'),
+          this.configService.get('cacheTTLs.currenciesRequest')!,
         );
         return currencies;
       }

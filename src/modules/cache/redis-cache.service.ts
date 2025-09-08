@@ -9,7 +9,6 @@ import { CacheStrategy } from './cache.strategy';
 import Keyv, { KeyvEntry } from 'keyv';
 import KeyvRedis, { createKeyv } from '@keyv/redis';
 import { ConfigService } from '@nestjs/config';
-import { getDataFromConfig } from 'src/utils/get-data-from-config';
 
 @Injectable()
 export class RedisCacheService
@@ -19,7 +18,7 @@ export class RedisCacheService
   private readonly logger = new Logger(RedisCacheService.name);
 
   constructor(private readonly configService: ConfigService) {
-    const redisUrl = getDataFromConfig<string>(this.configService, 'redis.url');
+    const redisUrl = this.configService.get<string>('redis.url')!;
 
     this.store = createKeyv(redisUrl) as Keyv<string>;
   }

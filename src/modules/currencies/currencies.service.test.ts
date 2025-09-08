@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { CurrenciesService } from './currencies.service';
 import { MemoryCacheService } from '../cache/memory-cache.service';
 import axios from 'axios';
-import { getDataFromConfig } from 'src/utils/get-data-from-config';
 
 // мокаем axios
 vi.mock('axios');
@@ -17,11 +16,6 @@ vi.mock(
   }),
 );
 
-// мокаем getDataFromConfig
-vi.mock('src/utils/get-data-from-config', () => ({
-  getDataFromConfig: vi.fn(),
-}));
-
 describe('CurrenciesService', () => {
   let service: CurrenciesService;
   let memoryCacheService: MemoryCacheService;
@@ -33,11 +27,10 @@ describe('CurrenciesService', () => {
       set: vi.fn(),
     } as any;
 
-    configService = { get: vi.fn() } as any;
+    configService = { get: vi.fn(() => 60) } as any;
 
     service = new CurrenciesService(memoryCacheService, configService);
 
-    (getDataFromConfig as any).mockReturnValue(60); // TTL по умолчанию
     vi.clearAllMocks();
   });
 

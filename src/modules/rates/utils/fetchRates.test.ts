@@ -6,7 +6,6 @@ import fetchRates from './fetchRates';
 import axios from 'axios';
 vi.mock('axios');
 
-import { getDataFromConfig } from 'src/utils/get-data-from-config';
 vi.mock('src/utils/get-data-from-config', () => ({
   getDataFromConfig: vi.fn(),
 }));
@@ -15,8 +14,7 @@ describe('fetchRates', () => {
   let configService: ConfigService;
 
   beforeEach(() => {
-    configService = { get: vi.fn() } as any;
-    (getDataFromConfig as any).mockReturnValue('TEST_API_KEY');
+    configService = { get: vi.fn(() => 'TEST_API_KEY') } as any;
     vi.clearAllMocks();
   });
 

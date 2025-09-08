@@ -5,7 +5,6 @@ import { userIdCookieName } from 'src/constants/auth.constants';
 import { UserService } from 'src/modules/user/user.service';
 import { RequestWithCookies } from 'src/types/Request';
 import { ResponseWithLocals } from 'src/types/Response';
-import { getDataFromConfig } from 'src/utils/get-data-from-config';
 
 // Creates new users. If this is first request, user token will send in local property in response.
 // Adds Set-Cookie header, if user this is first request.
@@ -36,10 +35,7 @@ export class AuthMiddleware implements NestMiddleware {
       //check if token exists in cookies
       const user = await this.userService.createUser();
 
-      const cookieOptions = getDataFromConfig<CookieOptions>(
-        this.configService,
-        'cookies',
-      );
+      const cookieOptions = this.configService.get<CookieOptions>('cookies')!;
 
       res.cookie(userIdCookieName, user.id, cookieOptions);
 
