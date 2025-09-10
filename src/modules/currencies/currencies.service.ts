@@ -11,17 +11,16 @@ export class CurrenciesService {
   ) {}
 
   async fetchSupported(): Promise<string[]> {
+    const cacheKey = this.fetchSupported.name;
     try {
-      const cached = await this.memoryCacheService.get<string[]>(
-        'currencies:GET:/api/currencies',
-      );
+      const cached = await this.memoryCacheService.get<string[]>(cacheKey);
       if (!cached) {
         const response = await fetchCurrencies();
 
         const currencies = Object.keys(response.data);
 
         await this.memoryCacheService.set(
-          'currencies:GET:/api/currencies',
+          cacheKey,
           currencies,
           this.configService.get('cacheTTLs.currenciesRequest')!,
         );
