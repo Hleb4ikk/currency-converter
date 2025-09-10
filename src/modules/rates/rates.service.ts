@@ -22,7 +22,7 @@ export class RatesService {
 
   async getRates(userId: string, target: string[], base?: string) {
     let base_currency = base;
-    // 1. check if base is provided
+    //validation
     if (!base_currency) {
       const user = await this.userService.getUserById(userId);
 
@@ -34,27 +34,21 @@ export class RatesService {
 
       base_currency = user.base_currency;
     }
-    // 2. check if target is not empty
+
     if (target.length === 0) {
       throw new BadRequestException('Targets param is empty');
     }
-
-    // 3. generate keys like USD->EUR, USD->GBP
+    //fetching data from cache
     const cacheKeys = target.map((target) => `${base_currency}->${target}`);
 
-    // 4. get values from cache by keys from 3 point
     const valuesFromCache: Array<number | undefined> =
       await this.redisCacheService.getMany<number>(cacheKeys);
 
-    // 5. merge keys and values to the Record like {USD->EUR: 1.15, USD->GBP: 0.86}.
-    // if value is undefined, it means that rate is not cached and be USD->JPY: undefined.
     const raw_cached_rates = mergeKeysAndValues<number>(
       cacheKeys.map((key) => key.split('->')[1]),
       valuesFromCache,
     );
 
-    // 6. from raw data get only rates that are not undefined.
-    // 7. Getting not cached rates. If they are undefined
     const cachedRates: Record<string, number> = {};
     const notCachedCurrencies: string[] = [];
     const notCachedRateKeys: string[] = [];
@@ -68,7 +62,7 @@ export class RatesService {
       }
     });
 
-    // 8. If we have not cached rates, we need to fetch them from API.
+    //caching
     if (notCachedCurrencies.length > 0) {
       const query_target = notCachedCurrencies.join(',');
 
@@ -87,7 +81,6 @@ export class RatesService {
       }
       const ttl = this.configService.get<number>('cacheTTLs.ratesRequest')!;
 
-      //9. Cache not cached rates.
       await this.redisCacheService.setMany(
         notCachedRateKeys.map((key, index) => ({
           key,
@@ -96,7 +89,6 @@ export class RatesService {
         })),
       );
 
-      // 10. return cached and not cached rates.
       return {
         base: responseData.base,
         rates: {
@@ -105,7 +97,7 @@ export class RatesService {
         },
       };
     }
-    //11. return cached rates if point 8 is not reached.
+
     return {
       base: base_currency,
       rates: cachedRates,
