@@ -9,14 +9,19 @@ export default async function fetchRates(
   base_currency: string,
   query_target: string,
 ): Promise<AxiosResponse<RatesResponseData>> {
+  const paramsMap = new Map([
+    ['api_key', configService.get('fxRatesApiKey')!],
+    ['base', base_currency],
+    ['currencies', query_target],
+    ['resolution', '1d'],
+    ['format', 'json'],
+  ]);
+
   try {
     const urlSearchParams = new URLSearchParams();
-
-    urlSearchParams.set('api_key', configService.get('fxRatesApiKey')!);
-    urlSearchParams.set('base', base_currency);
-    urlSearchParams.set('currencies', query_target);
-    urlSearchParams.set('resolution', '1d');
-    urlSearchParams.set('format', 'json');
+    paramsMap.forEach((value, key) => {
+      urlSearchParams.set(key, value);
+    });
 
     return await axios.get(`${apiHost}/latest?${urlSearchParams.toString()}`);
   } catch {
